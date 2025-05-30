@@ -1,0 +1,87 @@
+﻿@model IEnumerable<FoodDeliveryApp.Domain.DomainModels.Order>
+@{
+    ViewData["Title"] = "Order History";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Order History</h2>
+        <a asp-controller="Order" asp-action="ExportAllOrders" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Export All Orders
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover shadow-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Status</th>
+                    <th>Total Amount</th>
+                    <th>Order Date</th>
+                    <th>Restaurant</th>
+                    <th>Food Items</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td class="align-middle">@order.Id</td>
+                        <td class="align-middle">
+                            <span class="badge bg-@(order.Status.ToString().ToLower() == "completed" ? "success" :
+                                                 order.Status.ToString().ToLower() == "pending" ? "warning" : "primary")">
+                                @order.Status
+                            </span>
+                        </td>
+                        <td class="align-middle">@order.TotalAmount.ToString("C")</td>
+                        <td class="align-middle">@order.OrderDate.ToString("MMM dd, yyyy HH:mm")</td>
+                        <td class="align-middle">@(order.Restaurant?.Name ?? "N/A")</td>
+                        <td class="align-middle">
+                            @if (order.FoodItemsInOrder != null && order.FoodItemsInOrder.Any())
+                            {
+                                <div class="food-items-list">
+                                    @foreach (var item in order.FoodItemsInOrder)
+                                    {
+                                        <div class="food-item">
+                                            <span class="fw-semibold">@item.FoodItem.Name</span>
+                                            <span class="text-muted ms-2">× @item.Quantity</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No items</span>
+                            }
+                        </td>
+                        <td class="align-middle">
+                            <a asp-controller="Order"
+                               asp-action="CreateInvoice"
+                               asp-route-id="@order.Id"
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-file-pdf"></i> Create Invoice
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .food-items-list {
+        max-height: 100px;
+        overflow-y: auto;
+    }
+
+    .food-item {
+        padding: 2px 0;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: 1rem 0.75rem;
+    }
+</style>

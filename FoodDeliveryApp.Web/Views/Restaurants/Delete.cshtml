@@ -1,0 +1,157 @@
+﻿@model FoodDeliveryApp.Domain.DomainModels.Restaurant
+
+@{
+
+    ViewData["Title"] = "Delete Restaurant";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<div class="container mt-4">
+
+    <div class="card">
+
+        <div class="card-header bg-danger text-white">
+
+            <h3>Delete Restaurant</h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-warning">
+
+                <h5>Are you sure you want to delete @Model.Name?</h5>
+
+                <p>This action cannot be undone.</p>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded" style="max-width: 300px; max-height: 200px; object-fit: cover;" />
+
+                </div>
+
+                <div class="col-md-8">
+
+                    <dl class="row">
+
+                        <dt class="col-sm-4">
+
+                            @Html.DisplayNameFor(model => model.Name)
+
+                        </dt>
+
+                        <dd class="col-sm-8">
+
+                            @Html.DisplayFor(model => model.Name)
+
+                        </dd>
+
+                        <dt class="col-sm-4">
+
+                            @Html.DisplayNameFor(model => model.Address)
+
+                        </dt>
+
+                        <dd class="col-sm-8">
+
+                            @Html.DisplayFor(model => model.Address)
+
+                        </dd>
+
+                        <dt class="col-sm-4">
+
+                            @Html.DisplayNameFor(model => model.IsOpen)
+
+                        </dt>
+
+                        <dd class="col-sm-8">
+
+                            @if (Model.IsOpen)
+
+                            {
+
+                                <span class="badge bg-success">Open</span>
+
+                            }
+
+                            else
+
+                            {
+
+                                <span class="badge bg-secondary">Closed</span>
+
+                            }
+
+                        </dd>
+
+                        <dt class="col-sm-4">
+
+                            @Html.DisplayNameFor(model => model.AverageRating)
+
+                        </dt>
+
+                        <dd class="col-sm-8">
+
+                            @Html.DisplayFor(model => model.AverageRating)
+
+                        </dd>
+
+                        <dt class="col-sm-4">
+
+                            @Html.DisplayNameFor(model => model.PhoneNumber)
+
+                        </dt>
+
+                        <dd class="col-sm-8">
+
+                            @Html.DisplayFor(model => model.PhoneNumber)
+
+                        </dd>
+
+                        <dt class="col-sm-4">
+
+                            @Html.DisplayNameFor(model => model.BaseDeliveryFee)
+
+                        </dt>
+
+                        <dd class="col-sm-8">
+
+                            @Html.DisplayFor(model => model.BaseDeliveryFee) MKD
+
+                        </dd>
+
+                    </dl>
+
+                </div>
+
+            </div>
+
+            <form asp-action="Delete" class="mt-4">
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit" class="btn btn-danger">
+
+                        <i class="bi bi-trash"></i> Delete
+
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

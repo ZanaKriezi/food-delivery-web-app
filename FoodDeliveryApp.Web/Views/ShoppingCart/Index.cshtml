@@ -1,0 +1,152 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Options
+@model FoodDeliveryApp.Domain.DTO.ShoppingCartDTO
+@inject IOptions<FoodDeliveryApp.Domain.StripeSettings> Stripe
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<h2>Your shopping cart includes:</h2>
+
+@if (Model.FoodItemsInCarts != null && Model.FoodItemsInCarts.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Food Item</th>
+                <th>Restaurant</th>
+                <th>Price</th>
+                <th>Base Delivery Fee</th>
+                <th>Quantity</th>
+                @if (Model.FoodItemsInCarts.Any(item => item.FoodItem?.Extras != null && item.FoodItem.Extras.Any()))
+                {
+                    <th>Selected Extras</th>
+                }
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.FoodItemsInCarts.Count(); i++)
+            {
+                var item = Model.FoodItemsInCarts.ElementAt(i);
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            @if (!string.IsNullOrEmpty(item.FoodItem?.ImageUrl))
+                            {
+                                <img src="@item.FoodItem.ImageUrl" alt="@item.FoodItem.Name" class="img-thumbnail me-2" style="max-width: 50px;" />
+                            }
+                            @item.FoodItem?.Name
+                        </div>
+                    </td>
+                    <td>@item.FoodItem?.Restaurant?.Name</td>
+                    <td>@item.FoodItem?.Price.ToString("C")</td>
+                    <td>@item.FoodItem?.Restaurant?.BaseDeliveryFee.ToString("C")</td>
+                    <td>@item.Quantity</td>
+                    @if (Model.FoodItemsInCarts.Any(i => i.FoodItem?.Extras != null && i.FoodItem.Extras.Any()))
+                    {
+                        <td>
+                            @if (item.FoodItem?.Extras != null && item.FoodItem.Extras.Any())
+                            {
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var extra in item.FoodItem.Extras)
+                                    {
+                                        <li class="mb-1">
+                                            <span class="d-flex justify-content-between">
+                                                <span>@extra.Extra?.Name</span>
+                                                <span class="text-primary">(+@extra.Price.ToString("C"))</span>
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                    }
+                    <td>
+                        <a asp-action="Delete" asp-controller="ShoppingCart" asp-route-id="@item.FoodItem.Id"
+                           class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i> Remove
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                <td colspan="2"><strong>@Model.TotalPrice.ToString("C")</strong></td>
+                <td colspan="@(Model.FoodItemsInCarts.Any(i => i.FoodItem?.Extras != null && i.FoodItem.Extras.Any()) ? 3 : 2)"></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="text-center mt-4">
+        <div id="modalPlaceholder"></div>
+
+        <form asp-controller="ShoppingCart" asp-action="PayOrder" method="post" class="d-inline-block">
+            <article>
+                <script src="https://checkout.stripe.com/checkout.js"
+                        class="stripe-button"
+                        data-key="@Stripe.Value.PublishableKey"
+                        data-locale="auto"
+                        data-description="Foodie Deliveries Payment"
+                        data-amount="@(Model.TotalPrice * 100)"
+                        data-label="Pay @Model.TotalPrice.ToString("C")">
+                </script>
+            </article>
+        </form>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h4 class="alert-heading">Your shopping cart is empty!</h4>
+        <p class="mb-0">Browse our restaurants to add some delicious items to your cart.</p>
+    </div>
+}
+
+<style>
+    .list-unstyled li {
+        font-size: 0.9em;
+        color: #666;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+    }
+
+    .img-thumbnail {
+        border-radius: 4px;
+    }
+
+    .stripe-button-el {
+        background-image: none !important;
+        background-color: #007bff !important;
+        padding: 8px 16px !important;
+    }
+
+        .stripe-button-el span {
+            background-image: none !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+            font-family: inherit !important;
+        }
+</style>
+<script>
+    function loadModal() {
+        $.ajax({
+            url: '@Url.Action("PayOrder", "ShoppingCart")',
+            type: 'GET',
+            success: function (data) {
+                $('#modalPlaceholder').html(data);
+                $('#orderSuccesfulModal').modal('show');
+            }
+        });
+    }
+</script>

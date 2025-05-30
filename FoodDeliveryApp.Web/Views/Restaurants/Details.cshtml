@@ -1,0 +1,131 @@
+﻿@model FoodDeliveryApp.Domain.DomainModels.Restaurant
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<FoodDeliveryApp.Domain.Identity.Customer> SignInManager
+@{
+    ViewData["Title"] = "Restaurant Details";
+}
+
+<h1>@Model.Name</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid" />
+    </div>
+    <div class="col-md-8">
+        <dl class="row">
+            <dt class="col-sm-3">Address:</dt>
+            <dd class="col-sm-9">@Model.Address</dd>
+
+            <dt class="col-sm-3">Status:</dt>
+            <dd class="col-sm-9">@(Model.IsOpen ? "Open" : "Closed")</dd>
+
+            <dt class="col-sm-3">Average Rating:</dt>
+            <dd class="col-sm-9">@Model.AverageRating.ToString("F1") / 5</dd>
+
+            <dt class="col-sm-3">Phone Number:</dt>
+            <dd class="col-sm-9">@Model.PhoneNumber</dd>
+
+            <dt class="col-sm-3">Base Delivery Fee:</dt>
+            <dd class="col-sm-9">den @Model.BaseDeliveryFee.ToString("F2")</dd>
+        </dl>
+    </div>
+</div>
+
+<a asp-controller="FoodItems" asp-action="CreateNewFoodItem" asp-route-restaurantId="@Model.Id" class="btn btn-success">Add New Food Item</a>
+<a asp-controller="Restaurants" asp-action="GetMenu" asp-route-id="@Model.Id" class="btn btn-success">See MENU</a>
+
+
+
+
+<h2 class="mt-4">Reviews</h2>
+
+@if (Model.Reviews != null && Model.Reviews.Any())
+{
+    <div class="row">
+        @foreach (var review in Model.Reviews.OrderByDescending(r => r.DatePosted))
+        {
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Rating: @review.Rating / 5</h5>
+                        <p class="card-text">@review.Comment</p>
+                        <p class="card-text">
+                            <small class="text-muted">Posted by @review?.Customer?.UserName</small>
+                        </p>
+                        <p class="card-text">
+                            <small class="text-muted">Posted on @review?.DatePosted.ToString("MM/dd/yyyy")</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No reviews yet for this restaurant.</p>
+}
+
+@if (SignInManager.IsSignedIn(User))
+
+{
+
+    <form asp-controller="Restaurants" asp-action="AddReview" method="post">
+
+        <input type="hidden" name="RestaurantId" value="@Model.Id" />
+
+        <div class="form-group">
+
+            <label for="Rating">Rating:</label>
+
+            <select name="Rating" id="Rating" class="form-control" required>
+
+                <option value="">Select a rating</option>
+
+                <option value="1">1 - Poor</option>
+
+                <option value="2">2 - Fair</option>
+
+                <option value="3">3 - Good</option>
+
+                <option value="4">4 - Very Good</option>
+
+                <option value="5">5 - Excellent</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="Comment">Comment:</label>
+
+            <textarea name="Comment" id="Comment" class="form-control" rows="3"></textarea>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+
+    </form>
+
+}
+
+else
+
+{
+
+    <div class="alert alert-info">
+
+        <p>
+            Please <a asp-area="Identity"
+                      asp-page="/Account/Login"
+                      asp-route-returnUrl="@Url.Action("Details", "Restaurants", new { id = Model.Id })">log in</a>
+
+            to submit a review.
+        </p>
+
+    </div>
+
+}
+
+

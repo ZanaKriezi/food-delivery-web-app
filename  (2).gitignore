@@ -1,0 +1,43 @@
+# Ignore user-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore build outputs
+bin/
+obj/
+[Bb]uild/
+[Ll]ogs/
+*.log
+
+# Visual Studio cache
+.vs/
+
+# ASP.NET secrets & config
+appsettings.json
+appsettings.*.json
+
+# Ignore environment-specific files
+.env
+*.db
+
+# Ignore publish folder (optional)
+publish/
+
+# Ignore Rider & VSCode settings
+.idea/
+.vscode/
+
+# Ignore NuGet & package files
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+
+# Others
+*.tmp
+*.bak
+*.orig
+*.cache
+*.pidb

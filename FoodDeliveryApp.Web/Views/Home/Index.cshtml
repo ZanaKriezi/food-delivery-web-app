@@ -1,0 +1,49 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<FoodDeliveryApp.Domain.Identity.Customer> SignInManager
+@inject UserManager<FoodDeliveryApp.Domain.Identity.Customer> UserManager
+@{
+    ViewData["Title"] = "Home Page";
+}
+<link rel="stylesheet" href="~/css/CSS-Style/HomeScreenStyle.css" asp-append-version="true" />
+<body>
+
+
+@if (SignInManager.IsSignedIn(User))
+{
+    
+<div class="text-center">
+        <img src="~/images/LOGO.png" style="width:400px;height:400px;"/>
+        <br>
+        <h1>Order delivery near you!</h1>
+    <div class="m-3">
+        <form asp-controller="Restaurants" asp-action="Index" method="get">
+            <div class="input-group">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Search Restaurants..." value="@ViewData["CurrentFilter"]" />
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <a asp-controller="Restaurants" asp-action="Index" class="btn btn-success">See Restaurants</a>
+   
+</div>
+  
+
+}
+else
+{
+    <h1>Order delivery near you!</h1>
+    <div class="m-3">
+        <form asp-controller="Restaurants" asp-action="Index" method="get">
+            <div class="input-group">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Search Restaurants..." value="@ViewData["CurrentFilter"]" />
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+    <h2>Sign in to use all features!</h2>
+    <a class="btn btn-info" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    <a class="btn btn-info" asp-area="Identity" asp-page="/Account/Register">Register</a>
+}
+
+</body>

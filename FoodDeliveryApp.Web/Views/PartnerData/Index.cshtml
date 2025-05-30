@@ -1,0 +1,73 @@
+@model List<FoodDeliveryApp.Domain.DTO.Accommodation>
+
+@{
+    ViewData["Title"] = "Partner Accommodations";
+}
+
+<div class="container">
+    <h4 class="my-3">Partner Accommodations</h4>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead style="background-color: #f8f9fa; color: #333;">
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Address</th>
+                        <th>City</th>
+                        <th>Country</th>
+                        <th>Stars</th>
+                        <th>Price Per Night</th>
+                        <th>Contact</th>
+                        <th>Website</th>
+                        <th>Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var accommodation in Model)
+                    {
+                        <tr>
+                            <td>@accommodation.Name</td>
+                            <td>@accommodation.Type</td>
+                            <td>@accommodation.Address</td>
+                            <td>@accommodation.City</td>
+                            <td>@accommodation.Country</td>
+                            <td class="text-center">⭐ @accommodation.Stars</td>
+                            <td>
+                                <span class="badge bg-success fs-6">@accommodation.PricePerNight €</span>
+                            </td>
+                            <td>@accommodation.ContactNumber</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(accommodation.Website))
+                                {
+                                    <a href="@accommodation.Website" target="_blank">@accommodation.Website</a>                                }
+                                else
+                                {
+                                    <span class="text-muted">No Website</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (!string.IsNullOrEmpty(accommodation.ImageUrl))
+                                {
+                                    <img src="@accommodation.ImageUrl" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <img src="https://via.placeholder.com/100" class="img-thumbnail" alt="No Image Available" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center" role="alert">
+            No accommodations found.
+        </div>
+    }
+</div>

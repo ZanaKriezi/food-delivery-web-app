@@ -1,0 +1,97 @@
+﻿@model FoodDeliveryApp.Domain.DomainModels.FoodItemInCart
+
+<div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="addToCartModalLabel">Add to Cart</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+
+            <form asp-action="AddToCartConfirmed">
+
+                <div class="modal-body">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+
+                    <input type="hidden" asp-for="FoodItemId" />
+
+                    <input type="hidden" asp-for="ShoppingCartId" />
+
+
+
+                    <div class="form-group mb-3">
+
+                        <label asp-for="Quantity" class="control-label">Quantity</label>
+
+                        <input asp-for="Quantity" class="form-control" min="1" value="1" />
+
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+
+                    </div>
+
+                    @if (Model.FoodItem?.Extras != null && Model.FoodItem.Extras.Any())
+
+                    {
+
+                        <div class="form-group">
+
+                            <label class="control-label mb-2">Available Extras</label>
+
+                            @foreach (var extra in Model.FoodItem.Extras)
+
+                            {
+
+                                <div class="form-check d-flex justify-content-between align-items-center border-bottom py-2">
+
+                                    <div>
+
+                                        <input type="checkbox"
+                                               name="SelectedExtras"
+                                               value="@extra.Id"
+                                               class="form-check-input"
+                                               id="extra_@extra.Id" />
+
+                                        <label class="form-check-label" for="extra_@extra.Id">
+
+                                            @extra.Extra?.Name
+
+                                        </label>
+
+                                    </div>
+
+                                    <span class="text-muted">+$@extra.Price.ToString("F2")</span>
+
+                                </div>
+
+                            }
+
+                        </div>
+
+                    }
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                    <button type="submit" class="btn btn-primary">Add to Cart</button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

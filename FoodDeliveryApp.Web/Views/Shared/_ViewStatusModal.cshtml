@@ -1,0 +1,194 @@
+﻿@model FoodDeliveryApp.Domain.DomainModels.Order
+
+<div class="modal-content">
+    <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="orderModalLabel">
+            <i class="bi bi-receipt"></i> Order Details
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body">
+        @{
+            var statusClass = Model.Status switch
+            {
+                OrderStatus.Created => "bg-warning",
+                OrderStatus.Ready => "bg-primary",
+                OrderStatus.BeingDelivered => "bg-info",
+                OrderStatus.Delivered => "bg-success",
+                _ => "bg-secondary"
+            };
+
+            var statusIcon = Model.Status switch
+            {
+                OrderStatus.Created => "hourglass-split",
+                OrderStatus.Ready => "check-circle",
+                OrderStatus.BeingDelivered => "truck",
+                OrderStatus.Delivered => "check-circle-fill",
+                _ => "question-circle"
+            };
+
+            var progressWidth = Model.Status switch
+            {
+                OrderStatus.Created => "25%",
+                OrderStatus.Ready => "50%",
+                OrderStatus.BeingDelivered => "75%",
+                OrderStatus.Delivered => "100%",
+                _ => "0%"
+            };
+        }
+
+        <div class="order-progress mb-4">
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" style="width: @progressWidth"
+                     aria-valuenow="@progressWidth.TrimEnd('%')" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+                <span class="progress-label">Created</span>
+                <span class="progress-label">Ready</span>
+                <span class="progress-label">Being Delivered</span>
+                <span class="progress-label">Delivered</span>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title text-primary mb-3">Order Information</h6>
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">Status</small>
+                            <span class="badge @statusClass status-badge">
+                                <i class="bi bi-@statusIcon me-1"></i>
+                                @Model.Status.ToString()
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">Order ID</small>
+                            <p class="mb-0 fw-bold">@Model.Id</p>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">Order Date</small>
+                            <p class="mb-0">@Model.OrderDate.ToString("MMM dd, yyyy HH:mm")</p>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">Total Amount</small>
+                            <p class="mb-0 fw-bold text-primary">@Model.TotalAmount.ToString("0.00") MKD</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title text-primary mb-3">Delivery Information</h6>
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">Restaurant</small>
+                            <p class="mb-0">
+                                <i class="bi bi-shop me-1"></i>
+                                @Model.Restaurant?.Name
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">Estimated Delivery</small>
+                            <p class="mb-0">
+                                <i class="bi bi-clock me-1"></i>
+                                <span id="deliveryTimer">Calculating...</span>
+                            </p>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.AdditionalInfo))
+                        {
+                            <div class="mb-3">
+                                <small class="text-muted d-block mb-1">Additional Notes</small>
+                                <p class="mb-0 fst-italic text-muted">@Model.AdditionalInfo</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.FoodItemsInOrder != null && Model.FoodItemsInOrder.Any())
+            {
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary mb-3">Order Items</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th class="text-end">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.FoodItemsInOrder)
+                                        {
+                                            <tr>
+                                                <td>@item.FoodItem?.Name</td>
+                                                <td class="text-end">@item.FoodItem?.Price.ToString("0.00") MKD</td>
+                                            </tr>
+                                        }
+                                        <tr class="border-top">
+                                            <td class="fw-bold">Total</td>
+                                            <td class="text-end fw-bold">@Model.TotalAmount.ToString("0.00") MKD</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Close
+        </button>
+    </div>
+</div>
+
+<script>
+    function updateDeliveryTimer() {
+        const status = '@Model.Status';
+        const orderDate = new Date('@Model.OrderDate.ToString("o")');
+        const now = new Date();
+
+        let estimatedMinutes = 45;
+
+        switch(status) {
+            case 'Created':
+                estimatedMinutes = 45;
+                break;
+            case 'Ready':
+                estimatedMinutes = 30;
+                break;
+            case 'BeingDelivered':
+                estimatedMinutes = 15;
+                break;
+            case 'Delivered':
+                document.getElementById('deliveryTimer').innerHTML =
+                    '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Delivered</span>';
+                return;
+        }
+
+        const deliveryTime = new Date(orderDate.getTime() + estimatedMinutes * 60000);
+        const timeLeft = Math.max(0, deliveryTime - now);
+
+        if (timeLeft > 0) {
+            const minutesLeft = Math.floor(timeLeft / 60000);
+            document.getElementById('deliveryTimer').innerHTML =
+                `<span class="text-primary">${minutesLeft} minutes remaining</span>`;
+        } else {
+            document.getElementById('deliveryTimer').innerHTML =
+                '<span class="text-warning">Arriving soon</span>';
+        }
+    }
+
+    // Update timer immediately and then every minute
+    updateDeliveryTimer();
+    setInterval(updateDeliveryTimer, 60000);
+</script>

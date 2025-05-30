@@ -1,0 +1,38 @@
+﻿<style>
+    .success-container {
+        max-width: 500px;
+        margin: 40px auto;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .success-icon {
+        color: #28a745;
+        font-size: 48px;
+        margin-bottom: 20px;
+    }
+
+    .button-group {
+        margin-top: 30px;
+    }
+
+        .button-group .btn {
+            margin: 0 10px;
+        }
+</style>
+
+<div class="success-container">
+    <div class="card">
+        <div class="card-body">
+            <i class="bi bi-check-circle-fill success-icon"></i>
+            <h2>Payment Successful</h2>
+            <p>Thank you for your order!</p>
+
+            <div class="button-group">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                    Return Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
